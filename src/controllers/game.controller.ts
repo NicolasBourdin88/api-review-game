@@ -19,7 +19,7 @@ export class GameController extends Controller {
   }
 
   @Post('/')
-  public async createConsole (@Body() requestBody: GameDTO): Promise<GameDTO> {
+  public async createGame (@Body() requestBody: GameDTO): Promise<GameDTO> {
     const { title, console } = requestBody
     
     if (console?.id === undefined) {
@@ -30,7 +30,7 @@ export class GameController extends Controller {
     if (!getConsole){
       throw new Error("Console not found");
     }else {
-      return gameService.createConsole(title, console.id)
+      return gameService.createGame(title, console.id)
     }
   }
 

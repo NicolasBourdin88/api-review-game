@@ -45,6 +45,30 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"ReviewDTO": {
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "double"
+					},
+					"game": {
+						"$ref": "#/components/schemas/GameDTO"
+					},
+					"rating": {
+						"type": "number",
+						"format": "double"
+					},
+					"review_text": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"rating",
+					"review_text"
+				],
+				"type": "object",
+				"additionalProperties": false
 			}
 		},
 		"securitySchemes": {}
@@ -58,6 +82,143 @@
 		"contact": {}
 	},
 	"paths": {
+		"/reviews": {
+			"get": {
+				"operationId": "GetAllReview",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/ReviewDTO"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Reviews"
+				],
+				"security": [],
+				"parameters": []
+			},
+			"post": {
+				"operationId": "CreateReview",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ReviewDTO"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Reviews"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ReviewDTO"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/reviews/{id}": {
+			"get": {
+				"operationId": "GetReviewById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/ReviewDTO"
+										}
+									],
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Reviews"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			},
+			"patch": {
+				"operationId": "UpdateGame",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/ReviewDTO"
+										}
+									],
+									"nullable": true
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Reviews"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/ReviewDTO"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/consoles": {
 			"get": {
 				"operationId": "GetAllConsole",
@@ -243,7 +404,7 @@
 				"parameters": []
 			},
 			"post": {
-				"operationId": "CreateConsole",
+				"operationId": "CreateGame",
 				"responses": {
 					"200": {
 						"description": "Ok",

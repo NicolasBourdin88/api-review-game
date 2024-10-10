@@ -26,7 +26,7 @@ export class GameService {
       });
     }
 
-    public async createConsole(
+    public async createGame(
       title: string,
       console_id: number,
     ): Promise<Game> {
