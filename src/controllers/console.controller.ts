@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Delete, Route, Path, Body, Tags, Patch } from "tsoa";
 import { consoleService } from "../services/console.service";
 import { ConsoleDTO } from "../dto/console.dto";
+import { notFound } from "../error/NotFoundError";
 
 @Route("consoles")
 @Tags("Consoles")
@@ -14,7 +15,12 @@ export class ConsoleController extends Controller {
   // Récupère une console par ID
   @Get("{id}")
   public async getConsoleById(@Path() id: number): Promise<ConsoleDTO | null> {
-    return consoleService.getConsoleById(id);
+    const console = await consoleService.getConsoleById(id);
+    if(!console) { 
+        notFound(id.toString());
+    } else {
+        return console;
+    }
   }
 
   // Crée une nouvelle console
@@ -38,6 +44,9 @@ export class ConsoleController extends Controller {
     @Path() id: number,
     @Body() requestBody: ConsoleDTO
   ): Promise<ConsoleDTO | null> {
+    const console = await consoleService.getConsoleById(id);
+    if(!console) notFound(id.toString());
+    
     const { name, manufacturer } = requestBody;
     return consoleService.updateConsole(id, name, manufacturer);
   }
