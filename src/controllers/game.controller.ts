@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Route, Tags, Path, Post,Patch } from 'tsoa'
+import { Body, Controller, Get, Route, Tags, Path, Post,Patch, Delete } from 'tsoa'
 import { GameDTO } from '../dto/game.dto'
 import { gameService } from '../services/game.service'
-import { ConsoleController } from './console.controller'
 import { consoleService } from "../services/console.service";
 import { notFound } from '../error/NotFoundError';
+import { Game } from '../models/game.model';
+import { Review } from '../models/review.model';
+import { Op } from 'sequelize';
 
 @Route('games')
 @Tags('Games')
@@ -28,10 +30,30 @@ export class GameController extends Controller {
     const getConsole = await consoleService.getConsoleById(console!.id!);
 
     if (!getConsole){
-      throw new Error("Console not found");
+      throw notFound("Console with id " + console?.id);
     }else {
       return gameService.createGame(title, console.id)
     }
+  }
+
+  @Delete("{id}")
+  public async deleteGame(id: number): Promise<void> {
+    const game = await Game.findByPk(id);
+  
+    if(!game) notFound("Game with id :" + id);
+    
+    const reviews = await Review.findAll({
+      where: {
+        game_id: id
+      }
+    });
+
+    if(reviews.length > 0) {
+      const error = new Error("Can't delete, review corresponding to this game found");
+      (error as any).status = 404;
+      throw error;
+    }
+    game.destroy();
   }
 
     @Patch("{id}")

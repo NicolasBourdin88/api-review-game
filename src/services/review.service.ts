@@ -6,7 +6,22 @@ import { Review } from '../models/review.model'
 
 export class ReviewService {
   public async getAllReviews (): Promise<Review[]> {
-    return await Review.findAll()
+    return await Review.findAll(
+      {
+        include: [
+          {
+            model: Game,
+            as: 'game',
+            include: [
+              {
+                model: Console,
+                as: 'console'
+              }
+            ]
+          }
+        ]
+      }
+    )
   }
   public async getReviewById (id: number): Promise<ReviewDTO | null> {
     return Review.findByPk(id, {

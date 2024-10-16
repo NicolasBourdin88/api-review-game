@@ -2,6 +2,10 @@ import { Controller, Get, Post, Delete, Route, Path, Body, Tags, Patch } from "t
 import { consoleService } from "../services/console.service";
 import { ConsoleDTO } from "../dto/console.dto";
 import { notFound } from "../error/NotFoundError";
+import { Console } from "../models/console.model";
+import { Game } from "../models/game.model";
+import { Review } from "../models/review.model";
+import { Op } from "sequelize";
 
 @Route("consoles")
 @Tags("Consoles")
@@ -34,8 +38,36 @@ export class ConsoleController extends Controller {
 
   // Supprime une console par ID
   @Delete("{id}")
-  public async deleteConsole(@Path() id: number): Promise<void> {
-    await consoleService.deleteConsole(id);
+  public async deleteConsole(id: number): Promise<void> {
+    const console = await Console.findByPk(id);
+    const games = await Game.findAll({
+      where : {console_id : id}
+    });
+    const gameIds = games.map(game => game.id);
+
+    const reviews = await Review.findAll({
+      where: {
+        game_id: {
+          [Op.in]: gameIds
+        }
+      }
+    });
+
+    if(!console){
+      notFound("Console with id : "+id);
+    }
+
+    if(reviews.length > 0){
+      const error = new Error("Delete review corresponding to console");
+      (error as any).status = 404;
+      throw error;
+    }
+
+    games.forEach(game => {
+        game.destroy();
+    });
+  
+    console.destroy();
   }
 
   // Met à jour une console par ID
