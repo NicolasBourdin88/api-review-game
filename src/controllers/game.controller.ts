@@ -6,6 +6,8 @@ import { notFound } from '../error/NotFoundError';
 import { Game } from '../models/game.model';
 import { Review } from '../models/review.model';
 import { Op } from 'sequelize';
+import { ReviewDTO } from '../dto/review.dto';
+import { reviewService } from '../services/review.service';
 
 @Route('games')
 @Tags('Games')
@@ -54,6 +56,18 @@ export class GameController extends Controller {
       throw error;
     }
     game.destroy();
+  }
+
+  @Get("{id}/reviews")
+  public async getConsoleGames(@Path() id: number): Promise<ReviewDTO[] | null> {
+    const game = await gameService.getGameById(id);
+    if (!game) {
+      notFound("Game with id : " + id);
+    }
+
+    const allReviews: ReviewDTO[] = await reviewService.getAllReviews();
+    const filteredReviews = allReviews.filter(review => review.game?.id === id);
+    return filteredReviews;
   }
 
     @Patch("{id}")

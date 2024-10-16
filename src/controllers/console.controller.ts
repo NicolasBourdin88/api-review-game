@@ -6,6 +6,8 @@ import { Console } from "../models/console.model";
 import { Game } from "../models/game.model";
 import { Review } from "../models/review.model";
 import { Op } from "sequelize";
+import { GameDTO } from "../dto/game.dto";
+import { gameService } from "../services/game.service";
 
 @Route("consoles")
 @Tags("Consoles")
@@ -68,6 +70,18 @@ export class ConsoleController extends Controller {
     });
   
     console.destroy();
+  }
+
+  @Get("{id}/games")
+  public async getConsoleGames(@Path() id: number): Promise<GameDTO[] | null> {
+    const console = await consoleService.getConsoleById(id);
+    if (!console) {
+      notFound("Console with id : " + id);
+    }
+
+    const allGames: GameDTO[] = await gameService.getAllGames();
+    const filteredGames = allGames.filter(game => game.console?.id === id);
+    return filteredGames;
   }
 
   // Met à jour une console par ID
